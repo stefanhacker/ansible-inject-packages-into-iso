@@ -32,7 +32,7 @@ Example Playbook
       XKBMODEL: pc105
       #language
       XKBLAYOUT: de
-      #tasten varainaten
+      #key variants
       XKBVARIANT: nodeadkeys
       #other options
       XKBOPTIONS: ""
