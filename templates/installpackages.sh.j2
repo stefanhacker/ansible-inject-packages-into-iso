@@ -1,0 +1,9 @@
+#insert dns server
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+#install packages
+apt update
+apt install -y {% for package in packages_to_install %}{{ package }}{{ " " if not loop.last else "" }}{% endfor %}{% if install_ssh_server == true %} openssh-server{% endif %} 
+{% if set_root_pass != "" %}
+#set root password
+echo "root:{{ set_root_pass }}" | chpasswd
+{% endif %}

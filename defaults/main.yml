@@ -1,0 +1,39 @@
+---
+#path were the source iso copied manual or will downloaded to when url is given in download public url. The sorce path is qeal the tmp path
+path_to_src_iso_file_with_filename: /tmp/iso/debian11.iso
+#destination iso path with filename eg. to an tftpd folder. the folder must not exist. it will creates if not exist
+path_to_dest_iso_filename: /srv/tftp/images/debianlive_ssh/x86_64/debianlive_ssh.iso
+#this is the folder were squash initrd etc are. on debian this folder calls live ind linux mint its casper
+live_folder_name: "live/"
+#cleans only the workind dir where the extracted an recreates squashfs file is in at start
+clean_working_dir: False
+#clean tmp folder after fisnish all
+clean_tmp_folder: False
+#enable_download
+enable_download: False
+cpu_count_for_make_squashfs_again: 1
+#url for iso file
+download_public_iso_url: https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-11.3.0-amd64-standard.iso
+install_ssh_server: false
+#package list to inject
+packages_to_install: []
+#do not change
+working_dir: "{{ path_to_src_iso_file_with_filename | dirname }}/work/"
+#end do not change
+set_root_pass: ""
+#if hostname empty hosts file and hostname file is untocuhed
+hostname: ""
+#keyboardlayout
+#keyboadmodel
+XKBMODEL: pc105
+#language
+XKBLAYOUT: de
+#tasten varainaten
+XKBVARIANT: nodeadkeys
+#other options
+XKBOPTIONS: ""
+#backspace a few use guess
+BACKSPACE: ""
+
+
+

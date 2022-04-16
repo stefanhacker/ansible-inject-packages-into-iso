@@ -1,0 +1,6 @@
+#make binds
+#mount --bind /proc {{ working_dir }}/proc/
+#mount --bind /sys {{ working_dir }}/sys/
+#mount --bind /dev {{ working_dir }}/dev/
+#chroot it
+chroot {{ working_dir }} sh /installpackages.sh

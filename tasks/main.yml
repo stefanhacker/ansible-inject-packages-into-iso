@@ -1,0 +1,177 @@
+#Created from instruction https://www.dotpointer.ga/?section=notes&view=note&id_notes=164
+---
+- name: install depencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - genisoimage 
+    - p7zip-full 
+    - squashfs-tools
+
+
+
+- name: show varaibels
+  debug:
+    msg:
+     - "Source ido ISO : {{ path_to_src_iso_file_with_filename }}"
+     - "Path to tmp : {{ path_to_src_iso_file_with_filename | dirname }}/"
+     - "Path to workfolder (exctracted shquashfs) {{ path_to_dest_iso_filename | dirname }}/"
+     - "Path to cdrom folder: {{ path_to_dest_iso_filename | dirname }}/cdrom/"
+     - "Path do iso destination : {{ path_to_dest_iso_filename }}"
+
+- name: check destination tmp folder exist
+  stat:
+    path: "{{ path_to_src_iso_file_with_filename | dirname }}/"
+  register: stat_result_dest_folder
+
+- name: Create destination tmp folder if not exist
+  raw: "mkdir -p '{{ path_to_src_iso_file_with_filename | dirname }}/'"
+  when: stat_result_dest_folder.stat.exists == False    
+
+#cleanup working dir if exists from prev run
+- name: check  work folder exist
+  stat:
+    path: "{{ working_dir }}/"
+  register: stat_result_work_folder
+
+
+- name: cleanup working_dir
+  raw: "rm -r '{{ working_dir }}'"
+  when: clean_working_dir == True and stat_result_work_folder.stat.exists == True
+
+#Download iso when download : True
+- name: Check iso exist, when no download it in next task,  when url is provided and when set download is true
+  stat:
+    path: "{{ path_to_src_iso_file_with_filename }}"
+  register: stat_result_iso
+  when: enable_download == True
+
+- name: Download iso
+  get_url:
+    url: "{{ download_public_iso_url }}"
+    dest: "{{ path_to_src_iso_file_with_filename }}"
+    mode: 0664
+  when: stat_result_iso.stat.exists == False and enable_download == True
+  
+
+- name: Extract all from a LiveCD
+  include_role: 
+    name: extract_iso
+  vars:
+    path_to_iso: "{{ path_to_src_iso_file_with_filename }}" 
+    path_to_extract_dest: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
+    
+
+- name: check if squashfs already extracted
+  stat:
+    path: "{{ working_dir }}"
+  register: stat_result_exctracted_folder
+
+#extract squash fs, this command will create als the working directory
+- name: extract squashfs
+  raw: "unsquashfs -d '{{ working_dir }}' -processors 1 '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}/filesystem.squashfs' "
+  when: stat_result_exctracted_folder.stat.exists == False
+
+
+#add keyboard layout
+- name: set keyboard settings
+  template:
+    src: "keyboard.j2"
+    dest: "{{ working_dir }}etc/default/keyboard"
+ 
+#addhoste in hosts und hostname
+- name: set hosts file
+  template:
+    src: "hosts.j2"
+    dest: "{{ working_dir }}etc/hosts"
+  when: (hostname is defined) and (hostname|length > 0)
+ 
+- name: set hostname file
+  template:
+    src: "hostname.j2"
+    dest: "{{ working_dir }}etc/hostname"
+  when: (hostname is defined) and (hostname|length > 0)
+ 
+#install packages
+- name: show packages variables
+  debug:
+    msg: "Packages to install : {% for package in packages_to_install %}'{{ package }} '{% endfor %}"
+  
+- name: create startchroot shell script
+  template:
+    src: "startchroot.sh.j2"
+    dest: "{{ path_to_src_iso_file_with_filename | dirname }}/startchroot.sh"
+  when: (packages_to_install is defined) and (packages_to_install|length > 0)
+
+- name: create exitchroot shell script
+  template:
+    src: "exitchroot.sh.j2"
+    dest: "{{ path_to_src_iso_file_with_filename | dirname }}/exitchroot.sh"
+  when: (packages_to_install is defined) and (packages_to_install|length > 0)
+
+
+- name: create install packages shell script
+  template:
+    src: "installpackages.sh.j2"
+    dest: "{{ working_dir }}installpackages.sh"
+  when: (packages_to_install is defined) and (packages_to_install|length > 0)
+
+
+- name: run chroot script that runs install packages shell script
+  raw: "sh '{{ path_to_src_iso_file_with_filename | dirname }}/startchroot.sh'"
+  when: (packages_to_install is defined) and (packages_to_install|length > 0)
+
+- name: run chroot exit script
+  raw: "sh '{{ path_to_src_iso_file_with_filename | dirname }}/exitchroot.sh'"
+  when: (packages_to_install is defined) and (packages_to_install|length > 0)
+
+#Check SSH Server install
+  
+- name: install sshd config file
+  template:
+    src: "sshd_config.j2"
+    dest: "{{ working_dir }}etc/ssh/sshd_config"
+  when: install_ssh_server == True
+
+ #ssh end
+- name: check if an old squash exist in cdrom dir, if next task will remove it
+  stat:
+    path: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs"
+  register: stat_result_filesystem_old_squashfs_cdrom
+
+- name: Show stat_result_filesystem_old_squashfs_cdrom result
+  debug:
+    msg: 
+     - "Exist old sqash in cdrom path : {{ stat_result_filesystem_old_squashfs_cdrom.stat.exists }}"     
+     - Path to ols sqash '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs'
+    
+- name: delete old squash from cdrom folder
+  raw: "rm '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs'"
+  when: stat_result_filesystem_old_squashfs_cdrom.stat.exists == True
+
+#mksquashfs '/tmp/iso/work' '/tmp/iso/crom/live/filesystem.squashfs' -b 1024k -comp xz -Xbcj x86 -e boot -processors 1 
+#this task take very long, to show tzhe status
+- name: remake the squashfs filesystem out of the squashfs-root folder, it takes long, drink an coffee eat a pizza, it could take 30-60 min or longer, depend from size of squashfs image
+  raw: "mksquashfs '{{ working_dir }}' '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs' -b 1024k -comp xz -Xbcj x86 -e boot -processors {{ cpu_count_for_make_squashfs_again }}"
+  
+
+- name: check if iso dest folder stat_result_iso.stat.exists
+  stat:
+    path: "{{ path_to_dest_iso_filename | dirname }}/"
+  register: stat_result_path_to_dest_iso_filename
+
+- name: create iso dest folder if not exist
+  raw: "mkdir -p {{ path_to_dest_iso_filename | dirname }}/"
+  when: stat_result_path_to_dest_iso_filename.stat.exists == False
+
+
+- name: generate new iso  
+  shell: "genisoimage -r -V 'Debian 11Live SSH' -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o {{ path_to_dest_iso_filename }} {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
+  args:
+    chdir: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
+
+- name: cleanup tempfolder
+  raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}"
+  when: clean_tmp_folder == True
+

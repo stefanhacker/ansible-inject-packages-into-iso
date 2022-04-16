@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  role_name: ansible-inject-packages-into-iso
+  author: Stefan Hacker
+  description: Injects configs und Packes into Debian based Live ISOs
+  company: Hacker-Net Telekommuniaktion
+
+  license: MIT License
+
+  min_ansible_version: 2.6.4
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+
+  galaxy_tags:
+    - hackernet
+    - ubuntu
+    - bionic
+    - iso
+    - livecd
+    - inject
+    - custom
+    - customization
+    
