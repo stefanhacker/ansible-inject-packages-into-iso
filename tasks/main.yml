@@ -160,17 +160,13 @@
   stat:
     path: "{{ path_to_dest_iso_filename | dirname }}/"
   register: stat_result_path_to_dest_iso_filename
-
 - name: create iso dest folder if not exist
   raw: "mkdir -p {{ path_to_dest_iso_filename | dirname }}/"
   when: stat_result_path_to_dest_iso_filename.stat.exists == False
-
-
 - name: generate new iso  
   shell: "genisoimage -r -V 'Debian 11Live SSH' -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o {{ path_to_dest_iso_filename }} {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
   args:
     chdir: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
-
 - name: cleanup tempfolder
   raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}"
   when: clean_tmp_folder == True
