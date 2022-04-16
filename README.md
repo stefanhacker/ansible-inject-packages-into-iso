@@ -42,7 +42,7 @@ Example Playbook
 
 Description of Variables to be set
 ---
-#path were the source iso copied manual or will downloaded to when url is given in download public url. The sorce path is qeal the tmp path
+#path were the source iso copied manual or will downloaded to when url is given in download public url. The sorce path is basedir from iso file. the tmp path
 path_to_src_iso_file_with_filename: /tmp/iso/debian11.iso
 
 #destination iso path with filename eg. to an tftpd folder. the folder must not exist. it will creates if not exist
