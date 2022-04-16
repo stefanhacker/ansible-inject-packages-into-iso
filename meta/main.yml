@@ -2,7 +2,7 @@
 galaxy_info:
   #role_name: ansible-inject-packages-into-iso
   author: Stefan Hacker
-  description: Injects configs und Packes into Debian based Live ISOs
+  description: Injects configs und Packages into Debian/ubuntu  based Live ISOs
   company: Hacker-Net Telekommuniaktion
 
   license: MIT License
