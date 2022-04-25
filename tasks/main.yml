@@ -20,6 +20,7 @@
      - "Path to workfolder (exctracted shquashfs) {{ path_to_dest_iso_filename | dirname }}/"
      - "Path to cdrom folder: {{ path_to_dest_iso_filename | dirname }}/cdrom/"
      - "Path do iso destination : {{ path_to_dest_iso_filename }}"
+     - "CD/DVD type : {{ dvd_cd_typ }}"
    
 #cleanup tmp folder at start if exist and is set to true
 - name: check  work folder exist
@@ -100,7 +101,7 @@
 #extract squash fs, this command will create als the working directory
 - name: extract squashfs
   raw: "unsquashfs -d '{{ working_dir }}' -processors 1 '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}/filesystem.squashfs' "
-  when: stat_result_exctracted_folder.stat.exists == False and dvd_cd_typ==live
+  when: stat_result_exctracted_folder.stat.exists == False and dvd_cd_typ == live
 
 
 #add keyboard layout
@@ -131,29 +132,29 @@
   template:
     src: "startchroot.sh.j2"
     dest: "{{ path_to_src_iso_file_with_filename | dirname }}/startchroot.sh"
-  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ==live
+  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ == live
 
 - name: create exitchroot shell script
   template:
     src: "exitchroot.sh.j2"
     dest: "{{ path_to_src_iso_file_with_filename | dirname }}/exitchroot.sh"
-  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ==live
+  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ == live
 
 
 - name: create install packages shell script
   template:
     src: "installpackages.sh.j2"
     dest: "{{ working_dir }}installpackages.sh"
-  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ==live
+  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ == live
 
 
 - name: run chroot script that runs install packages shell script
   raw: "sh '{{ path_to_src_iso_file_with_filename | dirname }}/startchroot.sh'"
-  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ==live
+  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ == live
 
 - name: run chroot exit script
   raw: "sh '{{ path_to_src_iso_file_with_filename | dirname }}/exitchroot.sh'"
-  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ==live
+  when: (packages_to_install is defined) and (packages_to_install|length > 0) and dvd_cd_typ == live
 
 #Check SSH Server install
   
@@ -161,7 +162,7 @@
   template:
     src: "sshd_config.j2"
     dest: "{{ working_dir }}etc/ssh/sshd_config"
-  when: install_ssh_server == True and dvd_cd_typ==live
+  when: install_ssh_server == True and dvd_cd_typ == live
 
  #ssh end
 - name: check if an old squash exist in cdrom dir, if next task will remove it
@@ -183,8 +184,8 @@
 #this task take very long, to show tzhe status
 - name: remake the squashfs filesystem out of the squashfs-root folder, it takes long, drink an coffee eat a pizza, it could take 30-60 min or longer, depend from size of squashfs image
   raw: "mksquashfs '{{ working_dir }}' '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs' -b 1024k -comp xz -Xbcj x86 -e boot -processors {{ cpu_count_for_make_squashfs_again }}"
-  when: dvd_cd_typ==live
-  
+  when: dvd_cd_typ == live
+
 - name: generate new md5sum.txt
   shell: "{{ item }}"
   with_items:
