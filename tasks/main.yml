@@ -84,7 +84,7 @@
   with_items:
     - "chmod +w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
     - "gunzip {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
-    - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
     - "gzip {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
     - "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
   when: use_preseed_file == true
