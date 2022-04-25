@@ -1,49 +1,130 @@
+#_preseed_V1
 
-#### Contents of the preconfiguration file
-### Localization
-# Locale sets language and country.
-d-i debian-installer/locale select de_DE
+# Localization
+###########################################
 
-# The values can also be preseeded individually for greater flexibility.
-d-i debian-installer/language string de
-d-i debian-installer/country string DE
-d-i debian-installer/locale string de_DE.UTF-8
-# Optionally specify additional locales to be generated.
-#d-i localechooser/supported-locales multiselect en_US.UTF-8, nl_NL.UTF-8
+d-i debian-installer/language string en
+d-i debian-installer/country string AT
+d-i debian-installer/locale string en_US.UTF-8
 
-# Keyboard selection.
 d-i keyboard-configuration/xkb-keymap select de
 
-
-### Network configuration
-# netcfg will choose an interface that has link if possible. This makes it
-# skip displaying a list if there is more than one interface.
-d-i netcfg/choose_interface select auto
+# Network configuration
+###########################################
 
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
 # from being shown, even if values come from dhcp.
-#d-i netcfg/set_hostname string newdebian
-#d-i netcfg/set_domain string local
 
-# Disable that annoying WEP key dialog.
-d-i netcfg/wireless_wep string
-# The wacky dhcp hostname that some ISPs use as a password of sorts.
-#d-i netcfg/dhcp_hostname string radish
+# If you prefer to configure the network manually, uncomment this line
+# and add the static network configuration below.
+#d-i netcfg/disable_autoconfig boolean true
 
+d-i netcfg/get_hostname string myhostname
+d-i netcfg/get_domain string mydomain.net
 
-### Mirror settings
-# Mirror protocol:
-# If you select ftp, the mirror/country string does not need to be set.
-# Default value for the mirror protocol: http.
-#d-i mirror/protocol string ftp
+d-i netcfg/get_nameservers string 8.8.8.8
+
+# Mirror settings
+###########################################
+
+# Say that we do not want to set the mirror using the user interface.
 d-i mirror/country string manual
-d-i mirror/http/hostname string http.us.debian.org
+# Now we manually set the mirror server.
+d-i mirror/http/hostname string debian.lagis.at
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
 
-d-i preseed/early_command string anna-install network-console
+# Account setup
+###########################################
 
-# Setup ssh password
-d-i network-console/password password install
-d-i network-console/password-again password install
+# Skip creation of a root account
+# (normal user account will be able to use sudo).
+d-i passwd/root-login boolean false
+
+# Create a normal user account.
+d-i passwd/user-fullname string MyUser
+d-i passwd/username string myuser
+# Password encrypted using a crypt(3) hash. Use
+# mkpasswd -m sha-512 to generate a SHA-512 based crypt(3) hash for a password.
+d-i passwd/user-password-crypted password <YOUR_PASSWORD>
+
+# Partitioning
+###########################################
+
+d-i partman-auto/method string regular
+
+d-i partman-auto/disk string /dev/sda
+
+# The following blog post explains the min / prio / max values and how they are interpreted
+# (https://www.bishnet.net/tim/blog/2015/01/29/understanding-partman-autoexpert_recipe/).
+# 
+# The configuration below will result in a fixed size boot and swap partition.
+# The root partition will be formatted using btrfs and will take up
+# all the remaining space.
+# 
+d-i partman-auto/expert_recipe string                         \
+      boot-root ::                                            \
+              1024 200 1024 btrfs                             \
+                      $primary{ } $bootable{ }                \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ btrfs }   \
+                      mountpoint{ /boot }                     \
+              .                                               \
+              4096 10000 -1 btrfs                             \
+                      $primary{ }                             \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ btrfs }   \
+                      mountpoint{ / }                         \
+              .                                               \
+              8192 100 8192 linux-swap                        \
+                      $primary{ }                             \
+                      method{ swap } format{ }                \
+              .
+
+# This makes partman automatically partition without confirmation, provided
+# that you told it what to do using one of the methods above.
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# Package selection
+###########################################
+
+tasksel tasksel/first multiselect standard, ssh-server
+popularity-contest popularity-contest/participate boolean true
+
+# Boot loader installation
+##########################
+
+d-i grub-installer/only_debian boolean true
+
+# Due notably to potential USB sticks, the location of the MBR can not be
+# determined safely in general, so this needs to be specified:
+# To install to the first device (assuming it is not a USB stick):
+d-i grub-installer/bootdev  string default
+
+# Finishing up the installation
+###############################
+
+# Avoid that last message about the install being complete.
+d-i finish-install/reboot_in_progress note
+
+# Make user myuser ready-to be used by Ansible.
+d-i preseed/late_command string mkdir -p /target/home/myuser/.ssh \
+        && echo 'ssh-rsa <SSH_PUBLIC_KEY> myuser@mydomain.net' >> /target/home/myuser/.ssh/authorized_keys \
+        && chmod -R 700 /target/home/myuser/.ssh \
+        && chmod -R 600 /target/home/myuser/.ssh/authorized_keys \
+        && chown -R 1000:1000 /target/home/myuser/.ssh \
+        && echo 'myuser ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/myuser
+
+# Misc
+###############################
+
+# Do not prompt for scanning of additional CDs or
+# DVDs for use by the package manager (apt).
+apt-cdrom-setup	apt-setup/cdrom/set-first	boolean	false
+apt-cdrom-setup	apt-setup/cdrom/set-next	boolean	false
+apt-cdrom-setup	apt-setup/cdrom/set-failed	boolean	false
+apt-cdrom-setup	apt-setup/cdrom/set-double	boolean	false
