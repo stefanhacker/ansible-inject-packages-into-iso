@@ -88,7 +88,7 @@
     - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
     #- "7z a -m0=lzma:a=1 {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
     - "gzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
-    - "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
+    #- "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
   when: use_preseed_file == true
   
 - name: check if squashfs already extracted
