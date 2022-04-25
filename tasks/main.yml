@@ -20,15 +20,7 @@
      - "Path to workfolder (exctracted shquashfs) {{ path_to_dest_iso_filename | dirname }}/"
      - "Path to cdrom folder: {{ path_to_dest_iso_filename | dirname }}/cdrom/"
      - "Path do iso destination : {{ path_to_dest_iso_filename }}"
-
-- name: check destination tmp folder exist
-  stat:
-    path: "{{ path_to_src_iso_file_with_filename | dirname }}/"
-  register: stat_result_dest_folder
-
-- name: Create destination tmp folder if not exist
-  raw: "mkdir -p '{{ path_to_src_iso_file_with_filename | dirname }}/'"
-  when: stat_result_dest_folder.stat.exists == False    
+   
 #cleanup tmp folder at start if exist and is set to true
 - name: check  work folder exist
   stat:
@@ -39,6 +31,15 @@
   raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/"
   when: clean_tmp_folder_at_start == True and stat_result_tmp_folder_at_start.stat.exists == True
 
+#create tmp folder if not exist
+- name: check destination tmp folder exist
+  stat:
+    path: "{{ path_to_src_iso_file_with_filename | dirname }}/"
+  register: stat_result_dest_folder
+
+- name: Create destination tmp folder if not exist
+  raw: "mkdir -p '{{ path_to_src_iso_file_with_filename | dirname }}/'"
+  when: stat_result_dest_folder.stat.exists == False 
 
 #cleanup working dir if exists from prev run
 - name: check  work folder exist
