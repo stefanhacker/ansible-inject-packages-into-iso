@@ -29,6 +29,16 @@
 - name: Create destination tmp folder if not exist
   raw: "mkdir -p '{{ path_to_src_iso_file_with_filename | dirname }}/'"
   when: stat_result_dest_folder.stat.exists == False    
+#cleanup tmp folder at start if exist and is set to true
+- name: check  work folder exist
+  stat:
+    path: "{{ path_to_src_iso_file_with_filename | dirname }}/"
+  register: stat_result_tmp_folder_at_start
+
+- name: cleanup tempfolder after
+  raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/"
+  when: clean_tmp_folder_at_start == True and stat_result_tmp_folder_at_start.stat.exists == True
+
 
 #cleanup working dir if exists from prev run
 - name: check  work folder exist
@@ -188,7 +198,7 @@
   shell: "genisoimage -r -V 'Debian 11Live SSH' -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o {{ path_to_dest_iso_filename }} {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
   args:
     chdir: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
-- name: cleanup tempfolder
+- name: cleanup tempfolder after
   raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}"
-  when: clean_tmp_folder == True
+  when: clean_tmp_folder_after == True
 

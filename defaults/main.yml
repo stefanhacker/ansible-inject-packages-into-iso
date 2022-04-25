@@ -7,8 +7,10 @@ path_to_dest_iso_filename: /srv/tftp/images/debianlive_ssh/x86_64/debianlive_ssh
 live_folder_name: "live/"
 #cleans only the workind dir where the extracted an recreates squashfs file is in at start
 clean_working_dir: False
+#clean tmp folder at start
+clean_tmp_folder_at_start: False
 #clean tmp folder after fisnish all
-clean_tmp_folder: False
+clean_tmp_folder_after: False
 #enable_download, if enable iso will be downloaded from source given in download_public_iso_url
 enable_download: False
 #how many cores should use for rebuild the squash.fs (with one core it clould take an hour or longer, but its an cpu expensive progress. So be carefull how many cores you use )
