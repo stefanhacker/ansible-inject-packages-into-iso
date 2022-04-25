@@ -3,9 +3,13 @@
 path_to_src_iso_file_with_filename: /tmp/iso/debian11.iso
 #destination iso path with filename eg. to an tftpd folder. the folder must not exist. it will creates if not exist
 path_to_dest_iso_filename: /srv/tftp/images/debianlive_ssh/x86_64/debianlive_ssh.iso
-#this is the folder were squash initrd etc are. on debian this folder calls live and linux mint its called casper
+#this is the folder were squash initrd etc are. on debian this folder calls live and linux mint its called casper. If is netinstall no live cd only install
 live_folder_name: "live/"
 #cleans only the workind dir where the extracted an recreates squashfs file is in at start
+#dvd/cd type is live cd or install. You can not insert packages in install dvd/cd only in live. squashfs is needed
+#values:live,install
+dvd_cd_typ: live
+#cleans workind dir at start
 clean_working_dir: False
 #clean tmp folder at start
 clean_tmp_folder_at_start: False
