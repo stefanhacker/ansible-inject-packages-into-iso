@@ -19,9 +19,9 @@ cpu_count_for_make_squashfs_again: 1
 download_public_iso_url: https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-11.3.0-amd64-standard.iso
 #download_punlic_iso_url: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-11.3.0-amd64-netinst.iso
 #will install open_ssh server and enables root login per password, if it set true
-install_ssh_server: false
+install_ssh_server: False
 #use preseed file, debian system only, netinstall iso
-use_preseed_file: false
+use_preseed_file: False
 #package list to inject
 packages_to_install: []
 #do not change
