@@ -189,9 +189,9 @@
 - name: generate new md5sum.txt
   shell: "{{ item }}"
   with_items:
-    - "chmod +w .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
-    - "find {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/ -follow -type f ! -name md5sum.txt -print0 | xargs -0 md5sum > .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
-    - "chmod -w .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
+    - "chmod +w {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
+    - "find {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/ -follow -type f ! -name md5sum.txt -print0 | xargs -0 md5sum > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
+    - "chmod -w {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
 
 - name: check if iso dest folder stat_result_iso.stat.exists
   stat:
