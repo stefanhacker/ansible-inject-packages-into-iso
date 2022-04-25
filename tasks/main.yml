@@ -8,6 +8,7 @@
     - genisoimage 
     - p7zip-full 
     - squashfs-tools
+    - gzip
 
 
 
@@ -61,8 +62,22 @@
   vars:
     path_to_iso: "{{ path_to_src_iso_file_with_filename }}" 
     path_to_extract_dest: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
-    
-
+#add preseed
+- name: create preseed from template
+  template:
+    src: "preseed.cfg.j2"
+    dest: "{{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg"
+  when: use_preseed_file == true
+- name: add cretaet preseed
+  shell: "{{ item }}" 
+  with_items:
+    - "chmod +w -R .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
+    - "gunzip .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
+    - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "gzip .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "chmod -w -R .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
+  when: use_preseed_file == true
+  
 - name: check if squashfs already extracted
   stat:
     path: "{{ working_dir }}"
@@ -155,6 +170,12 @@
 - name: remake the squashfs filesystem out of the squashfs-root folder, it takes long, drink an coffee eat a pizza, it could take 30-60 min or longer, depend from size of squashfs image
   raw: "mksquashfs '{{ working_dir }}' '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}filesystem.squashfs' -b 1024k -comp xz -Xbcj x86 -e boot -processors {{ cpu_count_for_make_squashfs_again }}"
   
+- name: generate new md5sum.txt
+  shell: "{{ item }}"
+  with_items:
+    - "chmod +w .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
+    - "find {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/ -follow -type f ! -name md5sum.txt -print0 | xargs -0 md5sum > .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
+    - "chmod -w .{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/md5sum.txt"
 
 - name: check if iso dest folder stat_result_iso.stat.exists
   stat:
