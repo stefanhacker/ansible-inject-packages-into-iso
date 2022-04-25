@@ -109,7 +109,7 @@
   template:
     src: "keyboard.j2"
     dest: "{{ working_dir }}etc/default/keyboard"
- when: dvd_cd_typ == 'live'
+  when: dvd_cd_typ == 'live'
 #addhoste in hosts und hostname
 - name: set hosts file
   template:
