@@ -101,7 +101,7 @@
 #extract squash fs, this command will create als the working directory
 - name: extract squashfs
   raw: "unsquashfs -d '{{ working_dir }}' -processors 1 '{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/{{ live_folder_name }}/filesystem.squashfs' "
-  when: stat_result_exctracted_folder.stat.exists == False and dvd_cd_typ == live
+  when: stat_result_exctracted_folder.stat.exists == False and dvd_cd_typ == 'live'
 
 
 #add keyboard layout
