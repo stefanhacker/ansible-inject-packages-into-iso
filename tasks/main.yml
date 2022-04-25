@@ -83,14 +83,15 @@
 - name: add created preseed to initrd, this could take a while depends on cpu, 30-60 min
   shell: "{{ item }}" 
   with_items:
-    - "chmod +w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
-    - "gunzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "mkdir -p {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit"
+    #- "chmod +w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
+    - "gunzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd"
     - "rm {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
-    - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd"
     #- "7z a -m0=lzma:a=1 {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
-    - "gzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
+    - "gzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
     #- "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
-    - "rm {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/"
   when: use_preseed_file == true
   
 - name: check if squashfs already extracted
