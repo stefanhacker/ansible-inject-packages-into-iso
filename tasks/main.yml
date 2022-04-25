@@ -79,13 +79,13 @@
     src: "preseed.cfg.j2"
     dest: "{{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg"
   when: use_preseed_file == true
-- name: add cretaet preseed
+- name: add created preseed to initrd
   shell: "{{ item }}" 
   with_items:
     - "chmod +w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
     - "gunzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
     - "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
-    - "gzip {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
+    - "gzip {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
     - "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
   when: use_preseed_file == true
   
