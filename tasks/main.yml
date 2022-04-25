@@ -109,25 +109,25 @@
   template:
     src: "keyboard.j2"
     dest: "{{ working_dir }}etc/default/keyboard"
- 
+ when: dvd_cd_typ == 'live'
 #addhoste in hosts und hostname
 - name: set hosts file
   template:
     src: "hosts.j2"
     dest: "{{ working_dir }}etc/hosts"
-  when: (hostname is defined) and (hostname|length > 0)
+  when: (hostname is defined) and (hostname|length > 0) and dvd_cd_typ == 'live'
  
 - name: set hostname file
   template:
     src: "hostname.j2"
     dest: "{{ working_dir }}etc/hostname"
-  when: (hostname is defined) and (hostname|length > 0)
+  when: (hostname is defined) and (hostname|length > 0) and dvd_cd_typ == 'live'
  
 #install packages
 - name: show packages variables
   debug:
     msg: "Packages to install : {% for package in packages_to_install %}'{{ package }} '{% endfor %}"
-  
+  when: dvd_cd_typ == 'live'
 - name: create startchroot shell script
   template:
     src: "startchroot.sh.j2"
