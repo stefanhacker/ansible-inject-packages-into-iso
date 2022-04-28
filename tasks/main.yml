@@ -95,7 +95,7 @@
     - bash -c "cd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit && find . | cpio -o -H newc | gzip -9  > ../initrd.gz"
     #- "gzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
     #- "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
-    #- "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/"
+    - "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/"
   when: use_preseed_file == true
   
 - name: check if squashfs already extracted
@@ -209,7 +209,12 @@
   shell: "genisoimage -r -V 'Debian 11Live SSH' -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o {{ path_to_dest_iso_filename }} {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
   args:
     chdir: "{{ path_to_src_iso_file_with_filename | dirname }}/cdrom/"
+
 - name: cleanup tempfolder after
   raw: "rm -r {{ path_to_src_iso_file_with_filename | dirname }}"
+  when: clean_tmp_folder_after == True
+
+- name: cleanup tempfolder after
+  raw: "rmdir  {{ path_to_src_iso_file_with_filename | dirname }}"
   when: clean_tmp_folder_after == True
 
