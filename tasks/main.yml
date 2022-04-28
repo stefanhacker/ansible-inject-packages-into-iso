@@ -85,7 +85,7 @@
   with_items:
     - bash -c "mkdir -p {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit"
     #- "chmod +w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/"
-    - bash -c "cd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/ && zcat ../initrd.gz | cpio -i -d""
+    - bash -c "cd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/ && zcat ../initrd.gz | cpio -i -d"
     #- "gunzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd"
     - "rm {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
     #- "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd"
