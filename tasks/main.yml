@@ -69,7 +69,7 @@
   
 
 - name: Extract all from a LiveCD
-  include_role: 
+  import_role: 
     name: stefanhacker.ansible_extract_iso
   vars:
     path_to_iso: "{{ path_to_src_iso_file_with_filename }}" 
