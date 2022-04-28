@@ -1,68 +1,71 @@
 #_preseed_V1
-
+ 
 # Localization
 ###########################################
-
-d-i debian-installer/language string en
-d-i debian-installer/country string AT
-d-i debian-installer/locale string en_US.UTF-8
-
+ 
+d-i debian-installer/language string de
+d-i debian-installer/country string DE
+d-i debian-installer/locale string de_DE.UTF-8
+ 
 d-i keyboard-configuration/xkb-keymap select de
-
+ 
 # Network configuration
 ###########################################
-
+ 
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
 # from being shown, even if values come from dhcp.
-
+ 
 # If you prefer to configure the network manually, uncomment this line
 # and add the static network configuration below.
 #d-i netcfg/disable_autoconfig boolean true
-
-d-i netcfg/get_hostname string myhostname
+ 
+# SSELLE: PMX als Hostname reicht aus, da hier manuelle Handarbeit erforderlich sein wird
+d-i netcfg/get_hostname string pmx
 d-i netcfg/get_domain string mydomain.net
-
+ 
 d-i netcfg/get_nameservers string 8.8.8.8
-
+ 
 # Mirror settings
 ###########################################
-
+ 
 # Say that we do not want to set the mirror using the user interface.
 d-i mirror/country string manual
 # Now we manually set the mirror server.
-d-i mirror/http/hostname string debian.lagis.at
+d-i mirror/http/hostname string ftp.debian.org
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
-
+ 
 # Account setup
 ###########################################
-
+ 
 # Skip creation of a root account
 # (normal user account will be able to use sudo).
 d-i passwd/root-login boolean false
-
+ 
 # Create a normal user account.
-d-i passwd/user-fullname string MyUser
-d-i passwd/username string myuser
+d-i passwd/user-fullname string administrator
+d-i passwd/username string administrator
 # Password encrypted using a crypt(3) hash. Use
 # mkpasswd -m sha-512 to generate a SHA-512 based crypt(3) hash for a password.
-d-i passwd/user-password-crypted password <YOUR_PASSWORD>
-
+# Starten123!
+d-i passwd/user-password-crypted password $6$xO7d6o6P42RN8A.D$/9zpBAfJ8z6.bn2MbhhfxENI87BlitL3w6Jjs9kfxKdSYfcOyOgKNUiHY4dZHBlNQSsFqKp7zoIN38YjMDVkA0
+ 
 # Partitioning
 ###########################################
-
+ 
 d-i partman-auto/method string regular
-
+#d-i partman-auto/method string lvm
+ 
 d-i partman-auto/disk string /dev/sda
-
+ 
 # The following blog post explains the min / prio / max values and how they are interpreted
 # (https://www.bishnet.net/tim/blog/2015/01/29/understanding-partman-autoexpert_recipe/).
-# 
+#
 # The configuration below will result in a fixed size boot and swap partition.
 # The root partition will be formatted using btrfs and will take up
 # all the remaining space.
-# 
+#
 d-i partman-auto/expert_recipe string                         \
       boot-root ::                                            \
               1024 200 1024 btrfs                             \
@@ -81,50 +84,50 @@ d-i partman-auto/expert_recipe string                         \
                       $primary{ }                             \
                       method{ swap } format{ }                \
               .
-
+ 
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
-
+ 
 # Package selection
 ###########################################
-
+ 
 tasksel tasksel/first multiselect standard, ssh-server
 popularity-contest popularity-contest/participate boolean true
-
+ 
 # Boot loader installation
 ##########################
-
+ 
 d-i grub-installer/only_debian boolean true
-
+ 
 # Due notably to potential USB sticks, the location of the MBR can not be
 # determined safely in general, so this needs to be specified:
 # To install to the first device (assuming it is not a USB stick):
 d-i grub-installer/bootdev  string default
-
+ 
 # Finishing up the installation
 ###############################
-
+ 
 # Avoid that last message about the install being complete.
 d-i finish-install/reboot_in_progress note
-
-# Make user myuser ready-to be used by Ansible.
-d-i preseed/late_command string mkdir -p /target/home/myuser/.ssh \
-        && echo 'ssh-rsa <SSH_PUBLIC_KEY> myuser@mydomain.net' >> /target/home/myuser/.ssh/authorized_keys \
-        && chmod -R 700 /target/home/myuser/.ssh \
-        && chmod -R 600 /target/home/myuser/.ssh/authorized_keys \
-        && chown -R 1000:1000 /target/home/myuser/.ssh \
-        && echo 'myuser ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/myuser
-
+ 
+# Make user admin ready-to be used by Ansible.
+d-i preseed/late_command string mkdir -p /target/home/administrator/.ssh \
+        && echo 'ssh-rsa ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXSRNurzJUYYzDM7A7cLP6jWX2wXXRJQc+rsXNHmGqhHNV27+wKDs7xBiyInc+aLrUjf8GaoUxoRDWEWM8zw8+DnLo9tninRUEZ02aCjGOqUfnzd0N2LYFbuHDBjMVclgSqq3SFpnm2hRPzLsc8H6Rwvsh3oy9c+smjMGurC/VSatQx/8OiMWxdwOqfahtgxUTqU2R/U9Kdp78ynSoe85KI2j9EcSol1cRLLjLzFma9eamtI5yl1dJ6LOqYVVibKjjobrMLokQICJYlIduo1bK1AK5JoECMlZuEHMKjM2MyxHl6iwA6TlAHBnL8rH7Mz4uI8T5K+mdQDa8brYpmsNw3qquEztje9/HrkyzIcTV84VvRZCqT8ODm4jyLSUH3MLileb/fXbsPCjfsUhKk0iIQfiSTshfOFPfFqrFrBJ80LdU5e3ZuqawtAyxpzZdATY9dly5ZY3tpvJjz5xCyrn2fI/Ae4kXfCnInZEp831EWJAF6zH8nZMnBS/02lgszWhw50eASd7G6MQ3crHikvD+LjCYi+RsW4TnpzH3/WA89eePB4IWBMTC+EdYkKVH1syA6XafKuqRtdBDQhi0oNfIUH5CTDIMydoccfgE7Chz17q/xZOvxTQfF3RByDgDjf8JSjbzm7mQdtKZTnV5WWoI2gacngWYWsgEfE+5wPi3aw==> Sebastian Selle' >> /target/home/administrator/.ssh/authorized_keys \
+        && chmod -R 700 /target/home/administrator/.ssh \
+        && chmod -R 600 /target/home/administrator/.ssh/authorized_keys \
+        && chown -R 1000:1000 /target/home/administrator/.ssh \
+        && echo 'administrator ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/administrator
+ 
 # Misc
 ###############################
-
+ 
 # Do not prompt for scanning of additional CDs or
 # DVDs for use by the package manager (apt).
-apt-cdrom-setup	apt-setup/cdrom/set-first	boolean	false
-apt-cdrom-setup	apt-setup/cdrom/set-next	boolean	false
-apt-cdrom-setup	apt-setup/cdrom/set-failed	boolean	false
-apt-cdrom-setup	apt-setup/cdrom/set-double	boolean	false
+apt-cdrom-setup              apt-setup/cdrom/set-first            boolean               false
+apt-cdrom-setup              apt-setup/cdrom/set-next           boolean               false
+apt-cdrom-setup              apt-setup/cdrom/set-failed        boolean               false
+apt-cdrom-setup              apt-setup/cdrom/set-double      boolean               false
