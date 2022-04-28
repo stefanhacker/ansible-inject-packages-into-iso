@@ -92,7 +92,7 @@
     #- "echo {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg | cpio -H newc -o -A -F {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd"
     - "cp {{ path_to_src_iso_file_with_filename | dirname }}/preseed.cfg {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/initrd/preseed.cfg"
     #- "7z a -m0=lzma:a=1 {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd"
-    - bash -c "cd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit && find . | cpio -o -H newc | gzip -9  > ../initrd.gz"
+    - bash -c "cd {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit && find . | cpio -o -H newc | gzip -9  > ../initrdtest.gz"
     #- "gzip -c {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit > {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/initrd.gz"
     #- "chmod -w -R {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd"
     #- "rm -r {{ path_to_src_iso_file_with_filename | dirname }}/cdrom/install.amd/tmpinit/"
