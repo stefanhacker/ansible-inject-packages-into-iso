@@ -116,7 +116,7 @@ d-i finish-install/reboot_in_progress note
  
 # Make user admin ready-to be used by Ansible.
 d-i preseed/late_command string mkdir -p /target/home/administrator/.ssh \
-        && echo 'ssh-rsa ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXSRNurzJUYYzDM7A7cLP6jWX2wXXRJQc+rsXNHmGqhHNV27+wKDs7xBiyInc+aLrUjf8GaoUxoRDWEWM8zw8+DnLo9tninRUEZ02aCjGOqUfnzd0N2LYFbuHDBjMVclgSqq3SFpnm2hRPzLsc8H6Rwvsh3oy9c+smjMGurC/VSatQx/8OiMWxdwOqfahtgxUTqU2R/U9Kdp78ynSoe85KI2j9EcSol1cRLLjLzFma9eamtI5yl1dJ6LOqYVVibKjjobrMLokQICJYlIduo1bK1AK5JoECMlZuEHMKjM2MyxHl6iwA6TlAHBnL8rH7Mz4uI8T5K+mdQDa8brYpmsNw3qquEztje9/HrkyzIcTV84VvRZCqT8ODm4jyLSUH3MLileb/fXbsPCjfsUhKk0iIQfiSTshfOFPfFqrFrBJ80LdU5e3ZuqawtAyxpzZdATY9dly5ZY3tpvJjz5xCyrn2fI/Ae4kXfCnInZEp831EWJAF6zH8nZMnBS/02lgszWhw50eASd7G6MQ3crHikvD+LjCYi+RsW4TnpzH3/WA89eePB4IWBMTC+EdYkKVH1syA6XafKuqRtdBDQhi0oNfIUH5CTDIMydoccfgE7Chz17q/xZOvxTQfF3RByDgDjf8JSjbzm7mQdtKZTnV5WWoI2gacngWYWsgEfE+5wPi3aw==> Sebastian Selle' >> /target/home/administrator/.ssh/authorized_keys \
+        && echo '' >> /target/home/administrator/.ssh/authorized_keys \
         && chmod -R 700 /target/home/administrator/.ssh \
         && chmod -R 600 /target/home/administrator/.ssh/authorized_keys \
         && chown -R 1000:1000 /target/home/administrator/.ssh \
